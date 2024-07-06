@@ -18,8 +18,8 @@ name = "hexagex"
 path = "src/bin.rs"
 
 [dependencies]
-regex = "1.10.4"
-regex-syntax = "0.8.3"
+regex = "1.10.5"
+regex-syntax = "0.8.4"
 
 [dev-dependencies]
 hex = "0.4.3"

@@ -27,6 +27,9 @@ mod implemented {
         let mut attributes = unsafe { wavefront_aligner_attr_default };
         attributes.heuristic.strategy = wf_heuristic_strategy_wf_heuristic_none;
         attributes.alignment_scope = alignment_scope_t_compute_alignment;
+        // Turns out OpenMP thread sync kills perf
+        // attributes.system.max_num_threads = std::thread::available_parallelism().unwrap_or_else(|_| std::num::NonZero::new(1).expect("rubbish NonZero::new(1) failed")).get() as i32;
+        attributes.system.max_num_threads = 1;
 
         attributes.distance_metric = distance_metric_t_gap_affine;
         attributes.affine_penalties.gap_opening = -algo.gap_open as c_int;
