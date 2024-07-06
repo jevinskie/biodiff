@@ -58,5 +58,10 @@ opt-level = 3
 [profile.dist]
 inherits = "release"
 lto = true
-strip = "symbols"
+strip = true
 codegen-units = 1
+opt-level = 3
+debug = false
+incremental = false
+panic = "abort"
+overflow-checks = false

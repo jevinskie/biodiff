@@ -12,6 +12,17 @@ feature_summary(
   FATAL_ON_MISSING_REQUIRED_PACKAGES
   WHAT REQUIRED_PACKAGES_NOT_FOUND)
 
+include(CheckIPOSupported)
+check_ipo_supported(RESULT LTO_SUPPORTED OUTPUT LTO_CHECK_ERROR)
+if (LTO_SUPPORTED)
+  set(CMAKE_C_COMPILE_OPTIONS_IPO "-flto=full")
+endif()
+
+include(FindOpenMP)
+if (NOT OpenMP_FOUND)
+  message(WARNING "OpenMP not found!")
+endif()
+
 # ---- Dependencies
 
 find_package(Threads)
@@ -85,6 +96,18 @@ set_target_properties(wfa2_static PROPERTIES OUTPUT_NAME wfa2)
 set_target_properties(wfa2 PROPERTIES SOVERSION 0)
 target_include_directories(wfa2 PUBLIC ${WFA2_PATH} ${WFA2_PATH}/wavefront ${WFA2_PATH}/utils)
 target_include_directories(wfa2_static PUBLIC ${WFA2_PATH} ${WFA2_PATH}/wavefront ${WFA2_PATH}/utils)
+if (LTO_SUPPORTED)
+  set_property(TARGET wfa2_static wfa2 PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+else()
+  message(WARNING "LTO is not supported: ${LTO_CHECK_ERROR}")
+endif()
+if (OpenMP_FOUND)
+  target_compile_definitions(wfa2_static PRIVATE "WFA_PARALLEL")
+  target_compile_definitions(wfa2 PRIVATE "WFA_PARALLEL")
+  target_compile_options(wfa2_static PRIVATE ${OpenMP_C_FLAGS} -Xclang --linker-option=-l${OpenMP_C_LIB_NAMES})
+  target_compile_options(wfa2 PRIVATE ${OpenMP_C_FLAGS})
+  target_link_libraries(wfa2 ${OpenMP_C_LIB_NAMES})
+endif()
 add_library(wfa2::wfa2 ALIAS wfa2)
 add_library(wfa2::wfa2_static ALIAS wfa2_static)
 

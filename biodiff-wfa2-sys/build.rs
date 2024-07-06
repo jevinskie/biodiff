@@ -5,7 +5,7 @@ fn link_wfa() {
     // we have our own custom CMakeLists.txt which we use to replace
     // the original
     println!("cargo:rerun-if-changed=CMakeLists.txt");
-    let mut dst = cmake::Config::new(".").build_target("wfa2_static").build();
+    let mut dst = cmake::Config::new(".").generator("Ninja").define("CMAKE_C_COMPILER", "/opt/homebrew/opt/llvm/bin/clang").define("CMAKE_CXX_COMPILER", "/opt/homebrew/opt/llvm/bin/clang++").build_target("wfa2_static").build();
     dst.push("build");
 
     // search for the static library in the build directory
